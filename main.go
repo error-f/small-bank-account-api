@@ -226,33 +226,12 @@ func createAccountHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	tx, err := db.Begin()
-	if err != nil {
-		http.Error(w, "Failed to start transaction", http.StatusInternalServerError)
-		return
-	}
-
 	// Insert the account into the accounts table
 	var accountID string
 	var createdAt string
-	query := `INSERT INTO accounts (currency) VALUES ($1) RETURNING account_id, created_at`
-	if err := tx.QueryRow(query, requestData.Currency).Scan(&accountID, &createdAt); err != nil {
-		tx.Rollback()
+	query := `INSERT INTO accounts (user_id, currency) VALUES ($1, $2) RETURNING account_id, created_at`
+	if err := db.QueryRow(query, requestData.UserID, requestData.Currency).Scan(&accountID, &createdAt); err != nil {
 		http.Error(w, "Failed to create account", http.StatusInternalServerError)
-		return
-	}
-
-	// Insert the account into user_accounts table
-	query = `INSERT INTO user_accounts (user_id, account_id) VALUES ($1, $2)`
-	if _, err := tx.Exec(query, requestData.UserID, accountID); err != nil {
-		tx.Rollback()
-		http.Error(w, "Failed to create account", http.StatusInternalServerError)
-		return
-	}
-
-	// If all inserts were successful, commit the transaction
-	if err := tx.Commit(); err != nil {
-		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
 		return
 	}
 

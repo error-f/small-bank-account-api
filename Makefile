@@ -14,5 +14,6 @@ clean-run:
 # Run tests with the test database
 test:
 	docker-compose -f docker-compose.test.yml up -d
+	./wait-for-it.sh localhost:5432 --timeout=30 -- echo "Postgres is ready!"
 	go test
 	docker-compose -f docker-compose.test.yml down
