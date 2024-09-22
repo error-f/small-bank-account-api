@@ -1,0 +1,188 @@
+openapi: 3.0.0
+info:
+  title: Small Bank Account API
+  version: 1.0.0
+paths:
+  /api/accounts:
+    post:
+      summary: Create a new bank account
+      description: Creates a new bank account for a user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+                  description: UUID of the user
+                currency:
+                  type: string
+                  example: "USD"
+                  description: Currency code
+              required:
+                - user_id
+                - currency
+      responses:
+        '201':
+          description: Account successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  account_id:
+                    type: string
+                    example: "d1f75516-0526-4c07-bd5b-eebb0feec2a0"
+                  currency:
+                    type: string
+                    example: "USD"
+                  created_at:
+                    type: string
+                    example: "2024-09-22T12:00:00Z"
+                required:
+                  - user_id
+                  - account_id
+                  - currency
+                  - created_at
+        '400':
+          description: Invalid input
+        '405':
+          description: Method not allowed
+        '500':
+          description: Failed to create account
+
+  /api/accounts/add-money:
+    post:
+      summary: Add money to a bank account
+      description: Adds money to a specified bank account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+                account_id:
+                  type: string
+                  example: "d1f75516-0526-4c07-bd5b-eebb0feec2a0"
+                amount:
+                  type: number
+                  format: float
+                  example: 100.0
+                currency:
+                  type: string
+                  example: "USD"
+              required:
+                - user_id
+                - account_id
+                - amount
+                - currency
+      responses:
+        '200':
+          description: Money successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  account_id:
+                    type: string
+                  total_amount:
+                    type: number
+                    format: float
+                  currency:
+                    type: string
+                required:
+                  - user_id
+                  - account_id
+                  - total_amount
+                  - currency
+        '400':
+          description: Invalid input
+        '405':
+          description: Method not allowed
+        '500':
+          description: Failed to update account balance
+
+  /api/accounts/transfer-money:
+    post:
+      summary: Transfer money between accounts
+      description: Transfers money from one account to another.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+                source_account_id:
+                  type: string
+                  example: "d1f75516-0526-4c07-bd5b-eebb0feec2a0"
+                target_account_id:
+                  type: string
+                  example: "a2bfe916-0526-4c07-bd5b-eebb0feec2a0"
+                amount:
+                  type: number
+                  format: float
+                  example: 50.0
+                currency:
+                  type: string
+                  example: "USD"
+              required:
+                - user_id
+                - source_account_id
+                - target_account_id
+                - amount
+                - currency
+      responses:
+        '200':
+          description: Money successfully transferred
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  source_account_id:
+                    type: string
+                  source_total_amount:
+                    type: number
+                    format: float
+                  source_currency:
+                    type: string
+                  target_account_id:
+                    type: string
+                  target_total_amount:
+                    type: number
+                    format: float
+                  target_currency:
+                    type: string
+                required:
+                  - user_id
+                  - source_account_id
+                  - source_total_amount
+                  - source_currency
+                  - target_account_id
+                  - target_total_amount
+                  - target_currency
+        '400':
+          description: Invalid input
+        '405':
+          description: Method not allowed
+        '500':
+          description: Failed to update accounts balances

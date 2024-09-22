@@ -86,7 +86,6 @@ func transferMoneyHandler(w http.ResponseWriter, r *http.Request) {
 	// Log a transaction
 	query := `INSERT INTO transactions (user_id, source_account_id, target_account_id, amount, currency) VALUES ($1, $2, $3, $4, $5)`
 	if _, err := tx.Exec(query, requestData.UserID, requestData.SourceAccountID, requestData.TargetAccountID, requestData.Amount, requestData.Currency); err != nil {
-		log.Println("Failed to log transaction:", err)
 		tx.Rollback()
 		http.Error(w, "Failed to log transaction", http.StatusInternalServerError)
 		return
@@ -97,7 +96,6 @@ func transferMoneyHandler(w http.ResponseWriter, r *http.Request) {
 	var sourceAccountTotalAmount float64
 	var sourceCurrency string
 	if err := tx.QueryRow(query, requestData.Amount, requestData.SourceAccountID, requestData.Currency).Scan(&sourceAccountTotalAmount, &sourceCurrency); err != nil {
-		log.Println("Failed to decrease account balance:", err)
 		tx.Rollback()
 		http.Error(w, "Failed to update account balance", http.StatusInternalServerError)
 		return
@@ -108,7 +106,6 @@ func transferMoneyHandler(w http.ResponseWriter, r *http.Request) {
 	var targetAccountTotalAmount float64
 	var targetCurrency string
 	if err := tx.QueryRow(query, requestData.Amount, requestData.TargetAccountID, requestData.Currency).Scan(&targetAccountTotalAmount, &targetCurrency); err != nil {
-		log.Println("Failed to increase account balance:", err)
 		tx.Rollback()
 		http.Error(w, "Failed to update account balance", http.StatusInternalServerError)
 		return
@@ -169,7 +166,6 @@ func addMoneyHandler(w http.ResponseWriter, r *http.Request) {
 	// Log a transaction
 	query := `INSERT INTO transactions (user_id, source_account_id, amount, currency) VALUES ($1, $2, $3, $4)`
 	if _, err := tx.Exec(query, requestData.UserID, requestData.AccountID, requestData.Amount, requestData.Currency); err != nil {
-		log.Println("Failed to log transaction:", err)
 		tx.Rollback()
 		http.Error(w, "Failed to log transaction", http.StatusInternalServerError)
 		return
@@ -179,7 +175,6 @@ func addMoneyHandler(w http.ResponseWriter, r *http.Request) {
 	query = `UPDATE accounts SET amount = amount + $1 WHERE account_id = $2 AND currency = $3 RETURNING amount`
 	var totalAmount float64
 	if err := tx.QueryRow(query, requestData.Amount, requestData.AccountID, requestData.Currency).Scan(&totalAmount); err != nil {
-		log.Println("Failed to update account balance:", err)
 		tx.Rollback()
 		http.Error(w, "Failed to update account balance", http.StatusInternalServerError)
 		return
