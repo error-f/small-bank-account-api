@@ -9,7 +9,7 @@ run:
 
 clean-run:
 	rm -rf pgdata
-	docker-compose -f docker-compose.yml up --build
+	make run
 
 # Run tests with the test database
 test:

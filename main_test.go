@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -19,7 +20,14 @@ var testDB *sql.DB
 // TestMain runs before all tests and sets up the test environment.
 func TestMain(m *testing.M) {
 	// Set up database connection
-	connStr := "host=localhost port=5432 user=postgres password=password dbname=testdb sslmode=disable"
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		getEnvOrDefault("DB_HOST", "localhost"),
+		getEnvOrDefault("DB_PORT", "5432"),
+		getEnvOrDefault("DB_USER", "postgres"),
+		getEnvOrDefault("DB_PASSWORD", "password"),
+		getEnvOrDefault("DB_NAME", "testdb"),
+	)
+
 	var err error
 	testDB, err = sql.Open("postgres", connStr)
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 
 var db *sql.DB
 
-func getEnv(key, fallback string) string {
+func getEnvOrDefault(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
@@ -23,11 +23,11 @@ func getEnv(key, fallback string) string {
 func main() {
 	// Connect to PostgreSQL
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		getEnv("DB_HOST", "localhost"),
-		getEnv("DB_PORT", "5432"),
-		getEnv("DB_USER", "postgres"),
-		getEnv("DB_PASSWORD", "password"),
-		getEnv("DB_NAME", "testdb"),
+		getEnvOrDefault("DB_HOST", "localhost"),
+		getEnvOrDefault("DB_PORT", "5432"),
+		getEnvOrDefault("DB_USER", "postgres"),
+		getEnvOrDefault("DB_PASSWORD", "password"),
+		getEnvOrDefault("DB_NAME", "testdb"),
 	)
 
 	var err error

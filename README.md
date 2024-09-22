@@ -12,6 +12,14 @@ A simple API for managing bank accounts, with the following functionality:
 
 ## How To
 
+To spawn a PostgreSQL database and connect the app to it, you can configure the database settings in the `docker-compose` file and through environment variables:
+
+- `DB_HOST`
+- `DB_PORT`
+- `DB_USER`
+- `DB_PASSWORD`
+- `DB_NAME`
+
 ### Run Tests
 This command will spawn a container with a clean database and run tests against it:
 ```bash
