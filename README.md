@@ -46,7 +46,7 @@ make run
    ```bash
    make run
    ```
-2. Make requests. Example requests:
+2. Make requests. You can find the request specifications in the `open-api-spec.yaml` file. Examples:
 
 - **Create an Account**:
   ```bash
