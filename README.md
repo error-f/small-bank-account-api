@@ -62,3 +62,16 @@ make run
   ```bash
   curl -X POST "http://localhost:8080/api/accounts/transfer-money"   -d '{"user_id": "123e4567-e89b-12d3-a456-426614174000", "source_account_id": "d1f75516-0526-4c07-bd5b-eebb0feec2a0", "target_account_id": "d8b4dcff-8b69-4ce7-8db4-e3d9ae412dc1", "currency": "USD", "amount": 1}'
   ```
+
+## Potential improvements
+
+- Timezones for timestamps in database
+- Tracing, logging
+- Comprehensive error responses
+- Log failed transactions
+- Validate request/response schema
+- More APIs:
+    - Transfers in different currencies
+    - Get balance
+    - Get all accounts by user
+    - ...
