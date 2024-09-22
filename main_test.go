@@ -2,9 +2,7 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -15,39 +13,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var testDB *sql.DB
+var server *Server
 
 // TestMain runs before all tests and sets up the test environment.
 func TestMain(m *testing.M) {
-	// Set up database connection
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		getEnvOrDefault("DB_HOST", "localhost"),
-		getEnvOrDefault("DB_PORT", "5432"),
-		getEnvOrDefault("DB_USER", "postgres"),
-		getEnvOrDefault("DB_PASSWORD", "password"),
-		getEnvOrDefault("DB_NAME", "testdb"),
-	)
-
 	var err error
-	testDB, err = sql.Open("postgres", connStr)
+	server, err = NewServer()
 	if err != nil {
-		log.Fatalf("Failed to connect to test database: %v", err)
+		log.Fatal(err)
 	}
-
-	// Set global DB variable
-	db = testDB
 
 	// Run the tests
 	code := m.Run()
 
 	// Close the connection
-	testDB.Close()
+	server.db.Close()
 
 	// Exit with the result of the tests
 	os.Exit(code)
 }
 func TestCreateAccountHandler(t *testing.T) {
-	tx, terr := testDB.Begin()
+	tx, terr := server.db.Begin()
 	if terr != nil {
 		t.Fatalf("Failed to begin transaction: %v", terr)
 	}
@@ -60,7 +46,7 @@ func TestCreateAccountHandler(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// Call the handler
-	createAccountHandler(w, req)
+	server.CreateAccountHandler(w, req)
 
 	// Assert the response
 	assert.Equal(t, http.StatusCreated, w.Code, "expected status 201")
@@ -76,7 +62,7 @@ func createAccount(t *testing.T, user_id string, currency string) string {
 	body, _ := json.Marshal(reqBody)
 	req := httptest.NewRequest(http.MethodPost, "/api/accounts", bytes.NewReader(body))
 	w := httptest.NewRecorder()
-	createAccountHandler(w, req)
+	server.CreateAccountHandler(w, req)
 	assert.Equal(t, http.StatusCreated, w.Code)
 	var response CreateAccountResponse
 	json.NewDecoder(w.Body).Decode(&response)
@@ -84,7 +70,7 @@ func createAccount(t *testing.T, user_id string, currency string) string {
 }
 
 func TestAddMoneyHandler(t *testing.T) {
-	tx, terr := testDB.Begin()
+	tx, terr := server.db.Begin()
 	if terr != nil {
 		t.Fatalf("Failed to begin transaction: %v", terr)
 	}
@@ -100,7 +86,7 @@ func TestAddMoneyHandler(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// Call the handler
-	addMoneyHandler(w, req)
+	server.AddMoneyHandler(w, req)
 
 	// Assert the response
 	assert.Equal(t, http.StatusOK, w.Code, "expected status 200")
@@ -118,14 +104,14 @@ func addMoney(t *testing.T, user_id string, account_id string, amount float64, c
 	body, _ := json.Marshal(reqBody)
 	req := httptest.NewRequest(http.MethodPost, "/api/accounts/add-money", bytes.NewReader(body))
 	w := httptest.NewRecorder()
-	addMoneyHandler(w, req)
+	server.AddMoneyHandler(w, req)
 	assert.Equal(t, http.StatusOK, w.Code, "expected status 200")
 	var response AddMoneyResponse
 	json.NewDecoder(w.Body).Decode(&response)
 }
 
 func TestTransferMoneyHandler(t *testing.T) {
-	tx, terr := testDB.Begin()
+	tx, terr := server.db.Begin()
 	if terr != nil {
 		t.Fatalf("Failed to begin transaction: %v", terr)
 	}
@@ -142,7 +128,7 @@ func TestTransferMoneyHandler(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// Call the handler
-	transferMoneyHandler(w, req)
+	server.TransferMoneyHandler(w, req)
 
 	// Assert the response
 	assert.Equal(t, http.StatusOK, w.Code, "expected status 200")
