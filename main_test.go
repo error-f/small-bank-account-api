@@ -32,6 +32,48 @@ func TestMain(m *testing.M) {
 	// Exit with the result of the tests
 	os.Exit(code)
 }
+
+/*
+TODO: write more tests
+
+CreateAccountHandler:
+- bad method
+- invalid request
+- incorrect schema
+- bad currency
+- failed query
+
+AddMoneyHandler:
+- bad method
+- invalid request
+- incorrect schema
+- bad currency
+- negative amount
+- zero amount
+- unexisted account id
+- failed start transaction
+- failed first transaction
+- failed second transaction
+- failed commit
+
+TransferMoneyHandler:
+- bad method
+- invalid request
+- incorrect schema
+- bad currency
+- negative amount
+- zero amount
+- unexisted source account
+- unexisted target account
+- equal accounts
+- more money than account has
+- failed start transaction
+- failed first transaction
+- failed second transaction
+- failed third transaction
+- failed commit
+*/
+
 func TestCreateAccountHandler(t *testing.T) {
 	tx, terr := server.db.Begin()
 	if terr != nil {
